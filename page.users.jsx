@@ -49,36 +49,16 @@ class Users extends React.Component {
           </button>
 
           {this.state.showForm ?
-            <form style={{marginBottom: 30}}>
+            <form style={{marginBottom: 30, marginTop: 30}} onSubmit={(e)=>{ e.stopPropagation(); e.preventDefault(); props.addUser({...state.newUser}); }}>
               Name: <input type="text" defaultValue="" onChange={(e)=>this.formChange(e)} name="name" /><br />
-              <input type="button" className='btn btn-secondary' onClick={e=>{ props.addUser({...state.newUser}); return false; }} value="Save" />
+              
             </form>
             : null
           }
 
-          <table className="table">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Name</th>
-              </tr>
-            </thead>
-            <tbody>
-              {props.data.users && props.data.users.length ? props.data.users.map((user, i) => {
-                  return (
-                    <tr key={i}>
-                      <td>{i+1}</td>
-                      <td>{user.name}</td>
-                    </tr>
-                  )
-                }) :
-                <tr>
-                  <td colSpan={2}>No users found.</td>
-                </tr>
-              }
-            </tbody>
-          </table>
-
+          <MyTable data={props.data} deleteUser={props.deleteUser} />
+          
+          <LatestNews />
         </div>
       </main>
     )
@@ -87,4 +67,53 @@ class Users extends React.Component {
   
 
 
+}
+
+
+
+class MyTable extends React.Component {
+
+  render() {
+    let props = this.props;
+
+    return (
+
+      <table className="table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+          </tr>
+        </thead>
+        <tbody>
+          {props.data.users && props.data.users.length ? props.data.users.map((user, i) => {
+              return (
+                <MyRow key={i} i={i} user={user} deleteUser={props.deleteUser} />
+              )
+            }) :
+            <tr>
+              <td colSpan={3}>No users found.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    )
+
+  }
+}
+
+
+class MyRow extends React.Component {
+  render() {
+    let props = this.props;
+    return(
+      <tr>
+        <td>{props.i+1}</td>
+        <td>{props.user.name}</td>
+        <td>
+          <a href="#" onClick={(e)=>props.deleteUser(props.i)}>Delete</a>
+        </td>
+      </tr>
+    );
+  }
 }
