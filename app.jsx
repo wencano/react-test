@@ -32,9 +32,23 @@ class App extends React.Component {
    * Add User
    */
   addUser(user) {
+    let _this = this;
     let state = this.state;
-    state.users.push(user);
-    this.setState(state);
+    
+    // Update Users DB
+    $.get( "http://localhost/npm-test-api/", "task=addUser&newUser=" + JSON.stringify(user), function(res) {
+
+      try {
+        res = JSON.parse(res);
+        if( res && res.success && res.users ) 
+          _this.setState({...state, users: res.users });
+      }
+      catch(e) {
+        console.log("ERROR!", e);
+      }
+
+    });
+
   }
 
 
@@ -50,10 +64,27 @@ class App extends React.Component {
    * Delete User
    */
   deleteUser(index) {
-    console.log("deleteUser ", index);
+    let _this = this;
+    let state = this.state;
+
+    // Validate
+    if( !confirm( 'Are you sure?') ) 
+      return false;
     
-    this.state.users.splice(index, 1);
-    this.setState( this.state );
+    // Update Users DB
+    $.get( "http://localhost/npm-test-api/", "task=deleteUser&index=" + index, function(res) {
+      console.log(" DELETE RES ", res);
+      try {
+        res = JSON.parse(res);
+        if( res && res.success && res.users ) 
+          _this.setState({...state, users: res.users });
+      }
+      catch(e) {
+        console.log("ERROR!", e);
+      }
+
+    });
+
     
   }
 
@@ -88,6 +119,26 @@ class App extends React.Component {
 
       </div>
     )
+  }
+
+
+  componentWillMount() {
+    let _this = this;
+    let state = this.state;
+
+    $.get( "http://localhost/npm-test-api/", "task=getUsers", function(res){
+      
+      try {
+        res = JSON.parse(res);
+        console.log("USERS FROM DB ", res);
+        if( res && res.success && res.users ) 
+          _this.setState({...state, users: res.users });
+      }
+      catch(e) {
+        console.log("ERROR!", e);
+      }
+      
+    });
   }
 }
 
